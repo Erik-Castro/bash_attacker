@@ -3,7 +3,7 @@
 # Nome: bash_attacker
 # Autor: Erik Castro
 # Data de Criação: 08/10/2024
-# Data de modificação: 08/10/2024
+# Data de modificação: 09/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
 # Versão: 0.0.1-alpha
