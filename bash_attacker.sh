@@ -200,14 +200,28 @@ ataque(){
     done
 }
 
-banner_fn(){
-	local RED="\033[1;31m"
-	local RST="\033[0m"
-	
-	echo Bash Attacker | figlet -tcf smpoison | lolcat
-	echo -e "${RED}\tAtenção!${RST}"
-	echo -e "${RED}Você é totalmente responsavel pela forma de como utiliza este software${RST}"
-	echo
+banner_fn() {
+    # Definição de cores
+    local RED="\033[1;31m"
+    local GREEN="\033[1;32m"
+    local RST="\033[0m"
+
+    # Título do banner
+    local BANNER_TITLE="Bash Attacker"
+    local WARNING_MSG="Atenção! Você é totalmente responsável pelo uso deste software."
+
+    # Verificação se 'figlet' e 'lolcat' estão instalados
+    if command -v figlet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then
+        # Exibe o banner colorido com figlet e lolcat
+        figlet -tcf smpoison "$BANNER_TITLE" | lolcat
+        echo -e "${RED}\t$WARNING_MSG${RST}" | lolcat
+    else
+        # Caso figlet ou lolcat não estejam instalados, exibe um banner simples
+        echo -e "${GREEN}========= $BANNER_TITLE =========${RST}"
+        echo -e "${RED}$WARNING_MSG${RST}"
+    fi
+
+    echo # Adiciona uma linha em branco
 }
 
 main() {
