@@ -69,21 +69,32 @@ exibe_licen() {
     awk '/# Copyright/,/# THE SOFTWARE/' $0 | tr -d "\#" | sed "s/^# //g" | sed '$d'
 }
 
+# Exibe instruções de uso
+exibe_uso() {
+    echo "Uso: $0 [opções] <host> <porta>"
+    echo
+    echo "Este script realiza um ataque de negação de serviço (DoS) simples."
+    echo
+    echo "Opções:"
+    echo "  -h, --help         Exibe esta mensagem de ajuda"
+    echo "  --change-log       Exibe o histórico de mudanças"
+    echo "  --show             Exibe a licença"
+    echo "  -v, --version      Exibe a versão"
+    echo "  -p, --port <porta> Especifica a porta alvo (padrão: 80)"
+    echo "  -t, --time <tempo> Define o tempo de ataque em segundos (padrão: 35)"
+    echo "  -c, --childs <n>   Define o número de threads/child processes simultâneos (padrão: 1)"
+    echo "  --debug            Habilita o modo debug"
+    echo
+    echo "Exemplo de uso:"
+    echo "  $0 -p 8080 -t 60 -c 5 <host_alvo>"
+    echo
+    echo "Este script é fornecido 'como está', sem garantias, e seu uso é de inteira responsabilidade do usuário."
+}
+
 # Exibe o histórico de atualizações
 exibe_hist() {
     echo -e " ----------\n  Versões:\n ----------"
     grep -w "^# Versão" $0 | tr -d "\#" | sed '1d' | column -s: -t
-}
-
-# Exibe instruções de uso
-exibe_uso() {
-    echo "Uso: $0 [opções]"
-    echo "Opções:"
-    echo "  -h, --help     Exibe esta mensagem de ajuda"
-    echo "  --change-log   Exibe o histórico de mudanças"
-    echo "  --show         Exibe a licença"
-    echo "  -v, --version   Exibe a versão"
-
 }
 
 # Faz a requisição
@@ -189,11 +200,22 @@ ataque(){
     done
 }
 
+banner_fn(){
+	local RED="\033[1;31m"
+	local RST="\033[0m"
+	
+	echo Bash Attacker | figlet -tcf smpoison | lolcat
+	echo -e "${RED}\tAtenção!${RST}"
+	echo -e "${RED}Você é totalmente responsavel pela forma de como utiliza este software${RST}"
+	echo
+}
+
 main() {
+    banner_fn
     menu_check $@ || exit 1 
     ataque $host_alvo $porta_alvo "$tempo_ataque"
     wait # Aguarda que todod terminem
     return 0
 }
 
-main $@ && echo encerrado
+main $@ && echo encerrando execucao! | figlet -ctf miniwi | lolcat
