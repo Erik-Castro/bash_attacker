@@ -1,6 +1,6 @@
 # bash_attacker - Documentação
 
-**Versão atual**: 0.0.1-alpha  
+**Versão atual**: 0.3.1-alpha  
 **Autor**: Erik Castro  
 **Data de Criação**: 08/10/2024  
 **Licença**: MIT
@@ -31,7 +31,7 @@ Este software foi criado com o propósito de servir como uma ferramenta de pesqu
 ## 2. Requisitos
 
 - **Bash**: Versão 4.0 ou superior.
-- **Netcat (nc)**: Necessário para enviar as requisições de rede.
+- **Curl**: Necessário para enviar as requisições de rede.
 - **Figlet** e **Lolcat**: Utilizados para exibir banners de inicialização e finalização de execução (opcionais).
 
 ### Instalação dos requisitos no Ubuntu:
@@ -57,7 +57,7 @@ Depois, você pode executá-lo diretamente no terminal.
 
 ## 4. Funcionamento
 
-O script faz uso de requisições TCP simples para um determinado host e porta, podendo realizar múltiplas requisições simultâneas para simular um ataque de negação de serviço. Cada thread gerada pelo script envia uma requisição ao host alvo utilizando o comando `nc` (Netcat).
+O script faz uso de requisições TCP simples para um determinado host e porta, podendo realizar múltiplas requisições simultâneas para simular um ataque de negação de serviço. Cada thread gerada pelo script envia uma requisição ao host alvo utilizando o comando `curl`.
 
 **Fluxo de execução**:
 1. O usuário define o host e a porta alvo, junto com outras opções, como o número de threads e o tempo de ataque.

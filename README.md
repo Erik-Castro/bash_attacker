@@ -13,7 +13,7 @@ O Bash Attacker é uma ferramenta simples de ataque de negação de serviço (Do
 ## Requisitos
 
 - bash (>= 4.0)
-- netcat (nc)
+- Curl (para as requisições)
 - figlet e lolcat (opcionais, para exibição de banners)
 
 ## Funcionalidades
