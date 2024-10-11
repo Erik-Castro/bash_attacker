@@ -102,7 +102,7 @@ exibe_hist() {
 requisitar() {
     local host=$1
     local port=$2
-    curl --max-time 1 --silent -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
+    curl --silent --max-time 1 -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
 }
 
 # Valida se ip é valido (IPv4)
@@ -120,7 +120,7 @@ validar_host() {
     local host="$1"
 
     # Expressão regular para validar um nome de domínio (inclui subdomínios e domínios de TLD com mais de 3 letras)
-    if [[ $host =~ ^(([a-zA-Z0-9](-*[a-zA-Z0-9])*)\.)+[a-zA-Z]{2,}$ ]]; then
+    if [[ $host =~ ^(https?:\/\/)?(([a-zA-Z0-9](-*[a-zA-Z0-9])*)\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$  ]]; then
         return 0
     # Verifica se é um IP válido
     elif validar_ip "$host"; then
