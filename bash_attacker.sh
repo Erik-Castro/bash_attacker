@@ -11,6 +11,7 @@
 # Versões:
 # -----------
 # Versão 0.0.1-alpha: Código básico implementado.
+# Versão 0.3.1-alpha: Melhorias na requisição
 #
 # =====================================================
 # Licensa:
@@ -101,7 +102,7 @@ exibe_hist() {
 requisitar() {
     local host=$1
     local port=$2
-    echo -ne "GET / HTTP/1.1\r\nHost: $host\r\n\r\n" | nc -vq 1 $host $port &>/dev/null
+    curl --max-time 1 --silent -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
 }
 
 # Valida se ip é valido (IPv4)
@@ -241,7 +242,7 @@ banner_fn() {
     # Verificação se 'figlet' e 'lolcat' estão instalados
     if command -v figlet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then
         # Exibe o banner colorido com figlet e lolcat
-        figlet -tcf smpoison "$BANNER_TITLE" | lolcat
+        figlet -tc "$BANNER_TITLE" | lolcat
         echo -e "${RED}$WARNING_MSG${RST}" | lolcat
         echo -e "${YELLOW}$RESPONSIBILITY_MSG${RST}" | lolcat
     else
