@@ -49,7 +49,7 @@
 host_alvo="localhost"
 porta_alvo="80"
 threads_atual=1
-requisicoes=100
+_total_req=0
 tempo_ataque=35
 
 # despeja uma mensagem para a saída de erro padrão com data e hora.
@@ -102,7 +102,7 @@ exibe_hist() {
 requisitar() {
     local host=$1
     local port=$2
-    curl --silent --max-time 1 -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
+    curl --silent --max-time 1 -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}"
 }
 
 # Valida se ip é valido (IPv4)
@@ -219,13 +219,13 @@ ataque(){
        progress_bar $SECONDS 30 $t_final
 
        requisitar $host $port  &
+       ((_total_req++))
        ((controle++))
        if [[ "$controle" -ge "$threads_atual" ]]; then
           wait -n # Espera até que uma termine
 	  ((controle--))
        fi
     done
-    echo
 }
 
 banner_fn() {
@@ -256,11 +256,20 @@ banner_fn() {
     echo # Adiciona uma linha em branco
 }
 
+gerar_relatorio(){
+    echo "======================================"
+    echo "Total de Requisições: ${_total_req}"
+    echo "Tempo decorrido: ${tempo_ataque}"
+    echo "Media: $((_total_req / tempo_ataque)) req. por segundos"
+    echo "======================================"
+}
+
 main() {
     banner_fn
     menu_check $@ || exit 1 
     ataque $host_alvo $porta_alvo "$tempo_ataque"
-    wait # Aguarda que todod terminem
+    wait # Aguarda que todod terminem.
+    gerar_relatorio
     return 0
 }
 
