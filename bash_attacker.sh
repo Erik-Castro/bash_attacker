@@ -149,7 +149,7 @@ progress_bar() {
 
     # Gera a barra de progresso com tamanho fixo
     printf "["
-    printf "${YELLOW}%0.s#" $(seq 1 $done)    # Imprime os símbolos "#" (completado)
+    printf "${YELLOW}%0.s\u2588" $(seq 1 $done)    # Imprime os símbolos "#" (completado)
     printf "%0.s " $(seq 1 $left)    # Imprime os símbolos "-" (restante)
     printf "${RESET}] %3d%% (%d/%d)\r" $progress $current $total  # Imprime a porcentagem e o progresso atual
 }
@@ -215,14 +215,15 @@ ataque(){
     local t_ataque="$3"
     local t_final="$((SECONDS+t_ataque))"
 
-    while [[ SECONDS -lt t_final  ]]; do
+    while [[ SECONDS -lt t_final  ]]; do 
+       progress_bar $SECONDS 30 $t_final
+
        requisitar $host $port  &
        ((controle++))
        if [[ "$controle" -ge "$threads_atual" ]]; then
           wait -n # Espera até que uma termine
 	  ((controle--))
        fi
-       progress_bar $SECONDS 30 $t_final
     done
     echo
 }
