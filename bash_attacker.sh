@@ -13,6 +13,7 @@
 # Versão 0.0.1-alpha: Código básico implementado.
 # Versão 0.3.1-alpha: Melhorias na requisição
 # Versão 0.4.0-alpha: Relatório Geral implementado.
+# Versão 0.4.1-alpha: Implementado tempo de espera
 #
 # =====================================================
 # Licensa:
