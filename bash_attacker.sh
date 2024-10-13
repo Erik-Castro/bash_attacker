@@ -125,7 +125,7 @@ requisitar() {
     local sucess=$(cat $temp_file_su)
     local fail=$(cat $temp_file_fa)
     local req=$(cat $temp_file_req)
-    local flags=""
+    local flags="-X ${method} ${headers[@]}"
     
     if [[ $method == "POST" || $method == "PUT" ]]; then
 	flags="-X ${method} ${headers[@]} -d ${payload}"
@@ -352,4 +352,4 @@ main() {
     return 0
 }
 
-main $@ && echo encerrando execucao! | figlet -ctf miniwi | lolcat
+main "$@" && echo encerrando execucao! | figlet -ctf miniwi | lolcat
