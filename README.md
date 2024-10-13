@@ -1,7 +1,5 @@
 # Bash Attacker
 
-![exemplo]('video/video.mp4')
-
 Versão: 0.4.1-alpha  
 Autor: Erik Castro  
 Data de Criação: 08/10/2024
