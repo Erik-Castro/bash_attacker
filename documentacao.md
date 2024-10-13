@@ -84,6 +84,7 @@ O script faz uso de requisições TCP simples para um determinado host e porta, 
 - **-t, --time \<tempo\>**: Define o tempo de ataque em segundos (padrão: 35).
 - **-c, --childs \<n\>**: Define o número de threads simultâneas (padrão: 1).
 - **--debug**: Habilita o modo de depuração, exibindo mais detalhes sobre a execução.
+**-w, --wait**: define o tempo de espera para completar a requisição
 
 ### Parâmetros obrigatórios:
 - **\<host\>**: O endereço do host alvo (pode ser um IP ou domínio).
