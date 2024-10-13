@@ -1,6 +1,8 @@
 # Bash Attacker
 
-Versão: 0.3.1-alpha  
+![exemplo]('video/video.mp4')
+
+Versão: 0.4.1-alpha  
 Autor: Erik Castro  
 Data de Criação: 08/10/2024
 
@@ -39,6 +41,11 @@ bash_attacker [opções] <host> <porta>
 | --change-log      | Exibe o histórico de mudanças                           |
 | --show            | Exibe a licença                                         |
 | -v, --version   | Exibe a versão do software                              |
+| -w, --wait      | Define o tempo de espera para completar a requisição  |
+| -H, --headers   | Define cabeçalhos customizado  |
+| -m, --method    | Definine o método de requisição |
+| -P, --payload   | Define o payload da requisição |
+
 
 ### Exemplo de Uso
 
