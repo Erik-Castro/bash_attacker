@@ -61,9 +61,11 @@ tempo_espera=1
 method="GET"
 headers=()
 payload=""
+ABORT=0
 
 # limpa arquivos temporarios
 limpa_tmp(){
+    echo Limpando arquivos temporários
     rm -f $temp_file_fa $temp_file_su $temp_total_req "*.lock"
     [[ $? -eq "0" ]] && return 0 || return 1
 }
@@ -267,6 +269,12 @@ ataque(){
     local t_final="$((SECONDS + t_ataque))"
 
     while [[ SECONDS -lt t_final  ]]; do 
+	[[ $ABORT -eq 1 ]] && {
+	    echo Saida forçada pelo usiário!
+	    break
+	    limpa_tmp
+	} # se 1 loop quebrado.
+
        progress_bar $SECONDS 30 $t_final
 
        requisitar $host $port &
@@ -343,6 +351,12 @@ gerar_relatorio(){
     echo -e "${CYAN}======================================${RST}"
 }
 
+sg_abort(){
+    ABORT=1
+}
+
+trap sg_abort SIGINT SIGTERM
+
 main() {
     banner_fn
     menu_check $@ || exit 1 
@@ -353,3 +367,4 @@ main() {
 }
 
 main "$@" && echo encerrando execucao! | figlet -ctf miniwi | lolcat
+
