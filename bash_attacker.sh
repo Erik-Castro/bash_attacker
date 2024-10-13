@@ -97,6 +97,7 @@ exibe_uso() {
     echo "  -t, --time <tempo> Define o tempo de ataque em segundos (padrão: 35)"
     echo "  -c, --childs <n>   Define o número de threads/child processes simultâneos (padrão: 1)"
     echo "  --debug            Habilita o modo debug"
+    echo "  -w, --wait <tempo> Define o tempo de espera para cometar a requisição. (padrão: 1)"
     echo
     echo "Exemplo de uso:"
     echo "  $0 -p 8080 -t 60 -c 5 <host_alvo>"
