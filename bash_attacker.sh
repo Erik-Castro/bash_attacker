@@ -355,7 +355,7 @@ sg_abort(){
     ABORT=1
 }
 
-trap sg_abort SIGINT SIGTERM
+trap sg_abort SIGINT SIGTERM SIGABRT SIGSTOP
 
 main() {
     banner_fn
