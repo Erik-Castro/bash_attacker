@@ -6,7 +6,7 @@
 # Data de modificação: 13/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
-# Versão: 0.4.0-alpha
+# Versão: 0.4.1-alpha
 # # ================================================
 # Versões:
 # -----------
