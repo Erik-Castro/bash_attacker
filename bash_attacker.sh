@@ -58,6 +58,9 @@ echo 0 > $temp_file_fa # inicializando temp fa
 temp_file_su=$(mktemp)
 echo 0 > $temp_file_su # inicializa tem su
 tempo_espera=1
+method="GET"
+headers=()
+payload=""
 
 # limpa arquivos temporarios
 limpa_tmp(){
@@ -99,6 +102,9 @@ exibe_uso() {
     echo "  -c, --childs <n>   Define o número de threads/child processes simultâneos (padrão: 1)"
     echo "  --debug            Habilita o modo debug"
     echo "  -w, --wait <tempo> Define o tempo de espera para cometar a requisição. (padrão: 1)"
+    echo "  -H, --headers, <chave:valor> Define um cabeçalho personalizado"
+    echo "  -m, --method <método> define o método da requisição."
+    echo "  -P, --payload <payload> define o payload personalizado"
     echo
     echo "Exemplo de uso:"
     echo "  $0 -p 8080 -t 60 -c 5 <host_alvo>"
@@ -119,8 +125,13 @@ requisitar() {
     local sucess=$(cat $temp_file_su)
     local fail=$(cat $temp_file_fa)
     local req=$(cat $temp_file_req)
+    local flags=""
+    
+    if [[ $method == "POST" || $method == "PUT" ]]; then
+	flags="-X ${method} ${headers[@]} -d ${payload}"
+    fi
 
-    curl --silent --max-time "$tempo_espera" -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
+    curl $flags --silent --max-time "$tempo_espera" -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
     if [[ "$?" -eq "0" ]]; then
 	((sucess++))
 	echo $sucess >$temp_file_su
@@ -181,10 +192,21 @@ progress_bar() {
 
 # valida a entrada de paramêtros
 menu_check() {
-    local params=("$@")
 
     while [[ -n $1 ]]; do
         case "$1" in
+	-m|--method)
+	    shift
+	    [[ -n "$1" ]] && method="$1"
+	    ;;
+	-H|--headers)
+	    shift
+	    [[ -n "$1" ]] && headers+=("-H" "$1")
+	    ;;
+	-P|--payload)
+	    shift
+	    [[ -n "$1" ]] && payload="$1"
+	    ;;
 	-w|--wait)
 	    shift
 	    [[ "$1" -ge 1 ]] && tempo_espera="$1"
