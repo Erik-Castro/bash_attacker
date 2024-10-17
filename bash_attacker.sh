@@ -51,7 +51,8 @@
 host_alvo="localhost"
 porta_alvo="80"
 threads_atual=1
-_total_req=0
+_total_req=$(mktemp)
+echo 0 > $_total_req # inicializa a req
 tempo_ataque=35
 temp_file_fa=$(mktemp)
 echo 0 > $temp_file_fa # inicializando temp fa
@@ -66,7 +67,7 @@ ABORT=0
 # limpa arquivos temporarios
 limpa_tmp(){
     echo Limpando arquivos temporários
-    rm -f $temp_file_fa $temp_file_su $temp_total_req "*.lock"
+    rm -f $temp_file_fa $temp_file_su $temp_total_req $_total_req
     [[ $? -eq "0" ]] && return 0 || return 1
 }
 
@@ -124,16 +125,20 @@ exibe_hist() {
 requisitar() {
     local host=$1
     local port=$2
-    local sucess=$(cat $temp_file_su)
+    local flags="-X ${method} ${headers[@]}"
+    local lock="$(mktemp).lock"
+
+    (
+    flock -e 200 || exit 1
     local fail=$(cat $temp_file_fa)
-    local req=$(cat $temp_file_req)
-    local flags="-X $(echo ${method} ${headers[@]} | sed "s/=/: /g")"
-    
+    local sucess=$(cat $temp_file_su)
+    local req=$(cat $_total_req)
+
     if [[ $method == "POST" || $method == "PUT" ]]; then
-	flags="-X ${method} ${headers[@]} -d ${payload}"
+	flags="-X ${flags} -d ${payload}"
     fi
 
-    curl $flags --silent --max-time "$tempo_espera" -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
+    curl ${flags//=/:} --silent --max-time "$tempo_espera" -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
     if [[ "$?" -eq "0" ]]; then
 	((sucess++))
 	echo $sucess >$temp_file_su
@@ -141,6 +146,13 @@ requisitar() {
 	((fail++))
 	echo $fail >$temp_file_fa
     fi
+
+    ((req++))
+    echo $req >$_total_req
+
+    ) 200>"$lock"
+
+    rm -f "$lock"
 }
 
 # Valida se ip é valido (IPv4)
@@ -211,7 +223,7 @@ menu_check() {
 	    ;;
 	-w|--wait)
 	    shift
-	    [[ "$1" -ge 1 ]] && tempo_espera="$1"
+	    [[ "$1" -ge 0 ]] && tempo_espera="$1"
 	    ;;
 	-p|--port)
 	    shift
@@ -278,7 +290,7 @@ ataque(){
        progress_bar $SECONDS 30 $t_final
 
        requisitar $host $port &
-       ((_total_req++))
+
        ((controle++))
        if [[ "$controle" -ge "$threads_atual" ]]; then
           wait -n # Espera até que uma termine
@@ -326,23 +338,24 @@ gerar_relatorio(){
     local tempo_decorrido=$SECONDS
     local total_falhas=$(cat $temp_file_fa)
     local total_sucessos=$(cat $temp_file_su)
+    local total_req=$(cat $_total_req)
 
     # Proteção contra divisão por zero
     local media_req_por_seg="N/A"
     local media_req_por_thread="N/A"
 
     if [[ $tempo_decorrido -gt 0 ]]; then
-        media_req_por_seg=$(echo "scale=2; $_total_req / $tempo_decorrido" | bc)
+        media_req_por_seg=$(echo "scale=2; $total_req / $tempo_decorrido" | bc)
     fi
 
     if [[ $threads_atual -gt 0 ]]; then
-        media_req_por_thread=$(echo "scale=2; $_total_req / $threads_atual" | bc)
+        media_req_por_thread=$(echo "scale=2; $total_req / $threads_atual" | bc)
     fi
 
     echo -e "${CYAN}======================================"
     echo -e "${YELLOW}              RELATÓRIO               ${CYAN}"
     echo -e "======================================${RST}"
-    echo -e "${GREEN}Total de Requisições: ${CYAN}${_total_req}${RST}"
+    echo -e "${GREEN}Total de Requisições: ${CYAN}${total_req}${RST}"
     echo -e "${RED}Requisições Falhas: ${CYAN}${total_falhas}${RST}"
     echo -e "${GREEN}Requisições Bem Sucedidas: ${CYAN}${total_sucessos}${RST}"
     echo -e "${YELLOW}Tempo Decorrido: ${CYAN}${tempo_decorrido} segundos${RST}"
@@ -359,7 +372,7 @@ trap sg_abort SIGINT SIGTERM SIGABRT SIGSTOP
 
 main() {
     banner_fn
-    menu_check $@ || exit 1 
+    menu_check "$@" || exit 1 
     ataque $host_alvo $porta_alvo "$tempo_ataque"
     gerar_relatorio
     limpa_tmp
