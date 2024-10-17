@@ -51,8 +51,6 @@
 host_alvo="localhost"
 porta_alvo="80"
 threads_atual=1
-_total_req=$(mktemp)
-echo 0 > $_total_req # inicializa a req
 tempo_ataque=35
 temp_file_fa=$(mktemp)
 echo 0 > $temp_file_fa # inicializando temp fa
@@ -67,7 +65,7 @@ ABORT=0
 # limpa arquivos temporarios
 limpa_tmp(){
     echo Limpando arquivos temporários
-    rm -f $temp_file_fa $temp_file_su $temp_total_req $_total_req
+    rm -f $temp_file_fa $temp_file_su
     [[ $? -eq "0" ]] && return 0 || return 1
 }
 
@@ -132,7 +130,6 @@ requisitar() {
     flock -e 200 || exit 1
     local fail=$(cat $temp_file_fa)
     local sucess=$(cat $temp_file_su)
-    local req=$(cat $_total_req)
 
     if [[ $method == "POST" || $method == "PUT" ]]; then
 	flags="-X ${flags} -d ${payload}"
@@ -146,10 +143,6 @@ requisitar() {
 	((fail++))
 	echo $fail >$temp_file_fa
     fi
-
-    ((req++))
-    echo $req >$_total_req
-
     ) 200>"$lock"
 
     rm -f "$lock"
@@ -338,7 +331,7 @@ gerar_relatorio(){
     local tempo_decorrido=$SECONDS
     local total_falhas=$(cat $temp_file_fa)
     local total_sucessos=$(cat $temp_file_su)
-    local total_req=$(cat $_total_req)
+    local total_req=$(echo "scale=2; $total_falhas + $total_sucessos" | bc)
 
     # Proteção contra divisão por zero
     local media_req_por_seg="N/A"
