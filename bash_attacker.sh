@@ -104,7 +104,7 @@ exibe_uso() {
     echo "  -c, --childs <n>   Define o número de threads/child processes simultâneos (padrão: 1)"
     echo "  --debug            Habilita o modo debug"
     echo "  -w, --wait <tempo> Define o tempo de espera para cometar a requisição. (padrão: 1)"
-    echo "  -H, --headers, <chave:valor> Define um cabeçalho personalizado"
+    echo "  -H, --headers, <chave=valor> Define um cabeçalho personalizado"
     echo "  -m, --method <método> define o método da requisição."
     echo "  -P, --payload <payload> define o payload personalizado"
     echo
@@ -127,7 +127,7 @@ requisitar() {
     local sucess=$(cat $temp_file_su)
     local fail=$(cat $temp_file_fa)
     local req=$(cat $temp_file_req)
-    local flags="-X ${method} ${headers[@]}"
+    local flags="-X $(echo ${method} ${headers[@]} | sed "s/=/: /g")"
     
     if [[ $method == "POST" || $method == "PUT" ]]; then
 	flags="-X ${method} ${headers[@]} -d ${payload}"
