@@ -194,7 +194,7 @@ progress_bar() {
     printf "["
     printf "${YELLOW}%0.s\u2588" $(seq 1 $done)    # Imprime os símbolos "#" (completado)
     printf "%0.s " $(seq 1 $left)    # Imprime os símbolos "-" (restante)
-    printf "${RESET}] %03d%% (%2d/%2d)\r" $progress $current $total # imprime a barra de progresso.
+    printf "${RESET}] %03d%% (%03d/%03d)\r" $progress $current $total # imprime a barra de progresso.
 }
 
 # valida a entrada de paramêtros
