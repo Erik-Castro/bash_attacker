@@ -40,7 +40,7 @@ bash_attacker [opções] <host> <porta>
 | --show            | Exibe a licença                                         |
 | -v, --version   | Exibe a versão do software                              |
 | -w, --wait      | Define o tempo de espera para completar a requisição  |
-| -H, --headers   | Define cabeçalhos customizado  |
+| -H, --headers   | Define cabeçalhos customizado no formato 'Chave=valor' |
 | -m, --method    | Definine o método de requisição |
 | -P, --payload   | Define o payload da requisição |
 
