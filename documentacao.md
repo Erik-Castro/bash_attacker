@@ -85,7 +85,7 @@ O script faz uso de requisições TCP simples para um determinado host e porta, 
 - **-c, --childs \<n\>**: Define o número de threads simultâneas (padrão: 1).
 - **--debug**: Habilita o modo de depuração, exibindo mais detalhes sobre a execução.
 **-w, --wait**: define o tempo de espera para completar a requisição
-**-H, --headers <chave:valor>** Define o cabeçalho customizado.
+**-H, --headers <chave=valor>** Define o cabeçalho customizado.
 **-P, --payload <payload>** Define o payload para a requisição
 **-m, --method <método>** Define o método para a requisição
 
