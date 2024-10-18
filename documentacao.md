@@ -1,6 +1,6 @@
 # bash_attacker - Documentação
 
-**Versão atual**: 0.4.1-alpha  
+**Versão atual**: 0.5.0-alpha  
 **Autor**: Erik Castro  
 **Data de Criação**: 08/10/2024  
 **Licença**: MIT
@@ -38,7 +38,7 @@ Este software foi criado com o propósito de servir como uma ferramenta de pesqu
 
 ```bash
 sudo apt update
-sudo apt install figlet lolcat netcat
+sudo apt install figlet lolcat curl 
 ```
 
 ---
