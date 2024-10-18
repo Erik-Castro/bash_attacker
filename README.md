@@ -1,6 +1,6 @@
 # Bash Attacker
 
-Versão: 0.4.1-alpha  
+Versão: 0.5.0-alpha  
 Autor: Erik Castro  
 Data de Criação: 08/10/2024
 
@@ -43,6 +43,7 @@ bash_attacker [opções] <host> <porta>
 | -H, --headers   | Define cabeçalhos customizado no formato 'Chave=valor' |
 | -m, --method    | Definine o método de requisição |
 | -P, --payload   | Define o payload da requisição |
+| -r, --req  <n de req> | Determina o número de requisições por thread/child |
 
 
 ### Exemplo de Uso
