@@ -57,7 +57,7 @@ Este comando executa um ataque DoS simples no host especificado, direcionado à 
 - Versão 0.3.1-alpha: Melhorias na forma de requisição
 - Versão 0.4.0-alpha: Implementação de cabeçalhos e metodos de requisições customizadas
 - Versão 0.4.1-alpha: Implementado tempo de espera
-- Versão 0.5.0-alpha: Fix de bugs e implementado num    ero de requições.
+- Versão 0.5.0-alpha: Fix de bugs na contagem das requições e no `timeout` das requisições,implementado paramêtro para definir número máximo de requisição por thread/child.
 
 ## Licença
 
