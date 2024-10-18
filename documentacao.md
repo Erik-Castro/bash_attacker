@@ -88,6 +88,7 @@ O script faz uso de requisições TCP simples para um determinado host e porta, 
 **-H, --headers <chave=valor>** Define o cabeçalho customizado.
 **-P, --payload <payload>** Define o payload para a requisição
 **-m, --method <método>** Define o método para a requisição
+**-r, --req <número de req>** Determina o número de requisições por thread/child
 
 ### Parâmetros obrigatórios:
 - **\<host\>**: O endereço do host alvo (pode ser um IP ou domínio).
