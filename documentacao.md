@@ -84,11 +84,12 @@ O script faz uso de requisições TCP simples para um determinado host e porta, 
 - **-t, --time \<tempo\>**: Define o tempo de ataque em segundos (padrão: 35).
 - **-c, --childs \<n\>**: Define o número de threads simultâneas (padrão: 1).
 - **--debug**: Habilita o modo de depuração, exibindo mais detalhes sobre a execução.
-**-w, --wait**: define o tempo de espera para completar a requisição
-**-H, --headers <chave=valor>** Define o cabeçalho customizado.
-**-P, --payload <payload>** Define o payload para a requisição
-**-m, --method <método>** Define o método para a requisição
-**-r, --req <número de req>** Determina o número de requisições por thread/child
+- **-w, --wait**: define o tempo de espera para completar a requisição
+- **-H, --headers <chave=valor>** Define o cabeçalho customizado.
+- **-P, --payload <payload>** Define o payload para a requisição
+- **-m, --method <método>** Define o método para a requisição
+- **-r, --req <número de req>** Determina o número de requisições por thread/child
+- **-host <host>** O endereço do alvo a ser testado
 
 ### Parâmetros obrigatórios:
 - **\<host\>**: O endereço do host alvo (pode ser um IP ou domínio).
