@@ -6,7 +6,7 @@
 # Data de modificação: 17/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
-# Versão: 0.4.1-alpha
+# Versão: 0.5.0-alpha
 # # ================================================
 # Versões:
 # -----------
@@ -14,6 +14,7 @@
 # Versão 0.3.1-alpha: Melhorias na requisição
 # Versão 0.4.0-alpha: Relatório Geral implementado.
 # Versão 0.4.1-alpha: Implementado tempo de espera
+# Versão 0.5.0-alpha: Fix de bugs e implementado numero de requições.
 #
 # =====================================================
 # Licensa:
@@ -107,6 +108,7 @@ exibe_uso() {
     echo "  -H, --headers, <chave=valor> Define um cabeçalho personalizado"
     echo "  -m, --method <método> define o método da requisição."
     echo "  -P, --payload <payload> define o payload personalizado"
+    echo " -r, --req <número de requisições> determina o número de requisições por thread/child"
     echo
     echo "Exemplo de uso:"
     echo "  $0 -p 8080 -t 60 -c 5 <host_alvo>"
@@ -205,7 +207,7 @@ menu_check() {
 
     while [[ -n $1 ]]; do
         case "$1" in
-	-r)
+	-r|--req)
 	    shift
 	    [[ "$1" -ge 1 ]] && max_req="$1"
 	    ;;
