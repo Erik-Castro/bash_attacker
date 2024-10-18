@@ -128,6 +128,7 @@ requisitar() {
     local lock="$(mktemp).lock"
     
     for ((i=0; i < "$max_req"; i++)); do
+	[[ SECONDS -ge $(($tempo_ataque - $tempo_espera )) ]] && return 0
     (
     flock -e 200 || exit 1
     local fail=$(cat $temp_file_fa)
