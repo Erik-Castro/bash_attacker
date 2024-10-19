@@ -1,6 +1,6 @@
 # Bash Attacker
 
-Versão: 0.5.0-alpha  
+Versão: 0.5.1-alpha  
 Autor: Erik Castro  
 Data de Criação: 08/10/2024
 
@@ -58,6 +58,7 @@ Este comando executa um ataque DoS simples no host especificado, direcionado à 
 - Versão 0.4.0-alpha: Implementação de cabeçalhos e metodos de requisições customizadas
 - Versão 0.4.1-alpha: Implementado tempo de espera
 - Versão 0.5.0-alpha: Fix de bugs na contagem das requições e no `timeout` das requisições,implementado paramêtro para definir número máximo de requisição por thread/child.
+- Versão 0.5.1-alpha: Pequenas melhorias visuais na barra de progresso e relatório
 
 ## Licença
 

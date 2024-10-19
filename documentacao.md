@@ -1,6 +1,6 @@
 # bash_attacker - Documentação
 
-**Versão atual**: 0.5.0-alpha  
+**Versão atual**: 0.5.1-alpha  
 **Autor**: Erik Castro  
 **Data de Criação**: 08/10/2024  
 **Licença**: MIT
