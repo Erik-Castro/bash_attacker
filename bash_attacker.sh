@@ -3,10 +3,10 @@
 # Nome: bash_attacker
 # Autor: Erik Castro
 # Data de Criação: 08/10/2024
-# Data de modificação: 17/10/2024
+# Data de modificação: 19/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
-# Versão: 0.5.0-alpha
+# Versão: 0.5.1-alpha
 # # ================================================
 # Versões:
 # -----------
@@ -15,6 +15,7 @@
 # Versão 0.4.0-alpha: Relatório Geral implementado.
 # Versão 0.4.1-alpha: Implementado tempo de espera
 # Versão 0.5.0-alpha: Fix de bugs e implementado numero de requições.
+# Versão 0.5.1-alpha: Pequenas correições visuais no relatório
 #
 # =====================================================
 # Licensa:
@@ -281,6 +282,7 @@ ataque() {
     local port="$2"
     local t_ataque="$3"
     local t_final="$((SECONDS + t_ataque - $tempo_espera))"
+    local colunas=$(tput cols)
 
     while [[ SECONDS -lt t_final ]]; do
         [[ $ABORT -eq 1 ]] && {
@@ -289,7 +291,7 @@ ataque() {
             limpa_tmp
         } # se 1 loop quebrado.
 
-        progress_bar $SECONDS 30 $t_final
+	progress_bar $SECONDS $((colunas - 20)) $t_final
         requisitar $host $port &
 
         ((controle++))
@@ -336,6 +338,8 @@ gerar_relatorio() {
     local YELLOW="\033[1;33m"
     local CYAN="\033[1;36m"
     local RST="\033[0m"
+    local cols=$(tput cols) # largura do terminal
+    local lar=$((cols / 2))
 
     local tempo_decorrido=$SECONDS
     local total_falhas=$(cat $temp_file_fa)
@@ -357,12 +361,14 @@ gerar_relatorio() {
     echo -e "${CYAN}======================================"
     echo -e "${YELLOW}              RELATÓRIO               ${CYAN}"
     echo -e "======================================${RST}"
-    echo -e "${GREEN}Total de Requisições: ${CYAN}${total_req}${RST}"
-    echo -e "${RED}Requisições Falhas: ${CYAN}${total_falhas}${RST}"
-    echo -e "${GREEN}Requisições Bem Sucedidas: ${CYAN}${total_sucessos}${RST}"
-    echo -e "${YELLOW}Tempo Decorrido: ${CYAN}${tempo_decorrido} segundos${RST}"
-    echo -e "${YELLOW}Média de Requisições por Segundo: ${CYAN}${media_req_por_seg} req/s${RST}"
-    echo -e "${YELLOW}Média de Requisições por Thread: ${CYAN}${media_req_por_thread} req/thread${RST}"
+    {
+	echo -e "${GREEN}Total de Requisições: ${CYAN}${total_req}${RST}"
+	echo -e "${RED}Requisições Falhas: ${CYAN}${total_falhas}${RST}"
+	echo -e "${GREEN}Requisições Bem Sucedidas: ${CYAN}${total_sucessos}${RST}"
+	echo -e "${YELLOW}Tempo Decorrido: ${CYAN}${tempo_decorrido} segundos${RST}"
+	echo -e "${YELLOW}Média de Requisições por Segundo: ${CYAN}${media_req_por_seg} req/s${RST}"
+	echo -e "${YELLOW}Média de Requisições por Thread: ${CYAN}${media_req_por_thread} req/thread${RST}"
+    } | column -t -s:
     echo -e "${CYAN}======================================${RST}"
 }
 
@@ -376,6 +382,7 @@ main() {
     banner_fn
     menu_check "$@" || exit 1
     ataque $host_alvo $porta_alvo "$tempo_ataque"
+    echo # adiciona quebra de linha
     gerar_relatorio
     limpa_tmp
     return 0
