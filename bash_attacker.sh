@@ -358,18 +358,26 @@ gerar_relatorio() {
         media_req_por_thread=$(echo "scale=2; $total_req / $threads_atual" | bc)
     fi
 
-    echo -e "${CYAN}======================================"
-    echo -e "${YELLOW}              RELATÓRIO               ${CYAN}"
-    echo -e "======================================${RST}"
-    {
-	echo -e "${GREEN}Total de Requisições: ${CYAN}${total_req}${RST}"
-	echo -e "${RED}Requisições Falhas: ${CYAN}${total_falhas}${RST}"
-	echo -e "${GREEN}Requisições Bem Sucedidas: ${CYAN}${total_sucessos}${RST}"
-	echo -e "${YELLOW}Tempo Decorrido: ${CYAN}${tempo_decorrido} segundos${RST}"
-	echo -e "${YELLOW}Média de Requisições por Segundo: ${CYAN}${media_req_por_seg} req/s${RST}"
-	echo -e "${YELLOW}Média de Requisições por Thread: ${CYAN}${media_req_por_thread} req/thread${RST}"
-    } | column -t -s:
-    echo -e "${CYAN}======================================${RST}"
+    # Função para centralizar texto
+    centralizar() {
+	local text="$(echo $1 | sed "s/\033[[0-9]*m//g")"
+	local cols="$(tput cols)"
+        local largura="$(( (${#text}/2) + (cols/2) ))"
+
+	printf "%${largura}b\n" "$1"
+    }
+
+
+    centralizar "${CYAN}======================================${RST}"
+    centralizar "${YELLOW}RELATÓRIO${CYAN}"
+    centralizar "${CYAN}======================================${RST}"
+	centralizar "${GREEN}Total de Requisições: ${CYAN}${total_req}${RST}"
+	centralizar "${RED}Requisições Falhas: ${CYAN}${total_falhas}${RST}"
+	centralizar "${GREEN}Requisições Bem Sucedidas: ${CYAN}${total_sucessos}${RST}"
+	centralizar "${YELLOW}Tempo Decorrido: ${CYAN}${tempo_decorrido} segundos${RST}"
+	centralizar "${YELLOW}Média de Requisições por Segundo: ${CYAN}${media_req_por_seg} req/s${RST}"
+	centralizar "${YELLOW}Média de Requisições por Thread: ${CYAN}${media_req_por_thread} req/thread${RST}"
+    centralizar "${CYAN}======================================${RST}"
 }
 
 sg_abort() {
