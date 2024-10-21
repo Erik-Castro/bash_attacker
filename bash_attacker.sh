@@ -3,7 +3,7 @@
 # Nome: bash_attacker
 # Autor: Erik Castro
 # Data de Criação: 08/10/2024
-# Data de modificação: 19/10/2024
+# Data de modificação: 21/10/2024
 # Decription: Simples script de ataque de negação de
 # serviço.
 # Versão: 0.5.1-alpha
@@ -360,7 +360,7 @@ gerar_relatorio() {
 
     # Função para centralizar texto
     centralizar() {
-	local text="$(echo $1 | sed "s/\033[[0-9]*m//g")"
+	local text="$(echo $1 | sed "s/\\033\[[0-9;]*m//g")"
 	local cols="$(tput cols)"
         local largura="$(( (${#text}/2) + (cols/2) ))"
 
@@ -368,16 +368,16 @@ gerar_relatorio() {
     }
 
 
-    centralizar "${CYAN}======================================${RST}"
+    centralizar "${CYAN}==================================================${RST}"
     centralizar "${YELLOW}RELATÓRIO${CYAN}"
-    centralizar "${CYAN}======================================${RST}"
+    centralizar "${CYAN}==================================================${RST}"
 	centralizar "${GREEN}Total de Requisições: ${CYAN}${total_req}${RST}"
 	centralizar "${RED}Requisições Falhas: ${CYAN}${total_falhas}${RST}"
 	centralizar "${GREEN}Requisições Bem Sucedidas: ${CYAN}${total_sucessos}${RST}"
 	centralizar "${YELLOW}Tempo Decorrido: ${CYAN}${tempo_decorrido} segundos${RST}"
 	centralizar "${YELLOW}Média de Requisições por Segundo: ${CYAN}${media_req_por_seg} req/s${RST}"
 	centralizar "${YELLOW}Média de Requisições por Thread: ${CYAN}${media_req_por_thread} req/thread${RST}"
-    centralizar "${CYAN}======================================${RST}"
+    centralizar "${CYAN}==================================================${RST}"
 }
 
 sg_abort() {
